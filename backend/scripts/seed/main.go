@@ -10,7 +10,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/user/gapsi_orders_api/internal/infra/database"
+	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 	}
 	fmt.Println("Schema migration completed successfully.")
 
-	queries := database.New(db)
+	queries := sqlc.New(db)
 
 	file, err := os.Open("docs/orders_db.csv")
 	if err != nil {
@@ -66,7 +66,7 @@ func main() {
 		isFlash := record[12] == "TRUE"
 		isMarketplace := record[13] == "TRUE"
 
-		err = queries.CreateOrder(ctx, database.CreateOrderParams{
+		err = queries.CreateOrder(ctx, sqlc.CreateOrderParams{
 			ID:              record[0],
 			Canal:           record[1],
 			Cantidad:        int32(cantidad),

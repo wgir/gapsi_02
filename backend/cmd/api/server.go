@@ -13,6 +13,7 @@ import (
 	"github.com/user/gapsi_orders_api/internal/app"
 	"github.com/user/gapsi_orders_api/internal/infra/config"
 	"github.com/user/gapsi_orders_api/internal/infra/database"
+	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
 	apiHTTP "github.com/user/gapsi_orders_api/internal/infra/http"
 	"github.com/user/gapsi_orders_api/internal/infra/http/auth"
 	"github.com/user/gapsi_orders_api/internal/infra/http/orders"
@@ -56,7 +57,7 @@ func InitializeApp() (*App, error) {
 	}
 
 	// 4. Initialize Repositories
-	queries := database.New(db)
+	queries := sqlc.New(db)
 	userRepo := database.NewUserRepository(queries)
 	orderRepo := database.NewOrderRepository(queries)
 

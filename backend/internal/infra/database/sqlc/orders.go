@@ -1,4 +1,4 @@
-package database
+package sqlc
 
 import (
 	"context"
@@ -84,7 +84,7 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Order
+	items := make([]Order, 0, arg.Limit)
 	for rows.Next() {
 		var i Order
 		if err := rows.Scan(

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/user/gapsi_orders_api/internal/domain"
+	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
 )
 
 type orderRepo struct {
@@ -17,7 +18,7 @@ func NewOrderRepository(q OrderQuerier) domain.OrderRepository {
 func (r *orderRepo) List(ctx context.Context, filters domain.OrderFilters) ([]domain.Order, int64, error) {
 	offset := (filters.Page - 1) * filters.PageSize
 
-	dbOrders, err := r.queries.ListOrders(ctx, ListOrdersParams{
+	dbOrders, err := r.queries.ListOrders(ctx, sqlc.ListOrdersParams{
 		Canal:           filters.Canal,
 		Company:         filters.Company,
 		FulfillmentType: filters.FulfillmentType,
@@ -29,7 +30,7 @@ func (r *orderRepo) List(ctx context.Context, filters domain.OrderFilters) ([]do
 		return nil, 0, err
 	}
 
-	count, err := r.queries.CountOrders(ctx, CountOrdersParams{
+	count, err := r.queries.CountOrders(ctx, sqlc.CountOrdersParams{
 		Canal:           filters.Canal,
 		Company:         filters.Company,
 		FulfillmentType: filters.FulfillmentType,

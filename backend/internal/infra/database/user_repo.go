@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/user/gapsi_orders_api/internal/domain"
+	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
 )
 
 type userRepo struct {
@@ -15,12 +16,12 @@ func NewUserRepository(q UserQuerier) domain.UserRepository {
 }
 
 func (r *userRepo) Create(ctx context.Context, user *domain.User) error {
-	role := UserRoleUSER
+	role := sqlc.UserRoleUSER
 	if user.Role == domain.RoleAdmin {
-		role = UserRoleADMIN
+		role = sqlc.UserRoleADMIN
 	}
 
-	dbUser, err := r.queries.CreateUser(ctx, CreateUserParams{
+	dbUser, err := r.queries.CreateUser(ctx, sqlc.CreateUserParams{
 		Email:        user.Email,
 		PasswordHash: user.PasswordHash,
 		Role:         role,
@@ -51,9 +52,9 @@ func (r *userRepo) GetByID(ctx context.Context, id string) (*domain.User, error)
 	return mapDBUserToDomain(dbUser), nil
 }
 
-func mapDBUserToDomain(dbUser User) *domain.User {
+func mapDBUserToDomain(dbUser sqlc.User) *domain.User {
 	role := domain.RoleUser
-	if dbUser.Role == UserRoleADMIN {
+	if dbUser.Role == sqlc.UserRoleADMIN {
 		role = domain.RoleAdmin
 	}
 	return &domain.User{
