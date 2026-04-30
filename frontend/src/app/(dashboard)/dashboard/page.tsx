@@ -14,17 +14,17 @@ export default function DashboardPage() {
           Visualiza y gestiona las órdenes de venta en tiempo real.
         </p>
       </div>
-
+      {/* Global stats and charts stay at the top and don't depend on table filters */}
+      <StatsCards />
       {/* Table filters are now placed right above the table */}
       <div className="space-y-6">
         <div className="flex flex-col gap-4">
           <h3 className="text-lg font-semibold text-gray-900">Gestión de Pedidos</h3>
           <Filters />
+          <OrdersTable />
         </div>
-        <OrdersTable />
+
       </div>
-      {/* Global stats and charts stay at the top and don't depend on table filters */}
-      <StatsCards />
       <OrdersCharts />
     </div>
   );
