@@ -1,7 +1,6 @@
 package orders
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -24,7 +23,7 @@ func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
 	if page < 1 {
 		page = 1
 	}
-	pageSize, _ := strconv.Atoi(query.Get("pageSize"))
+	pageSize, _ := strconv.Atoi(query.Get("page_size"))
 	if pageSize < 1 {
 		pageSize = 10
 	}
@@ -40,28 +39,24 @@ func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	orders, total, err := h.orderService.ListOrders(r.Context(), filters)
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusInternalServerError, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
-	response := map[string]interface{}{
-		"data":  orders,
-		"total": total,
-		"page":  page,
-		"size":  pageSize,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	common.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
+		"data":      orders,
+		"total":     total,
+		"page":      page,
+		"page_size": pageSize,
+	})
 }
 
 func (h *OrderHandler) Stats(w http.ResponseWriter, r *http.Request) {
 	stats, err := h.orderService.GetStats(r.Context())
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusInternalServerError, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(stats)
+	common.RespondWithJSON(w, http.StatusOK, stats)
 }

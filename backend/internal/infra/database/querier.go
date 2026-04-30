@@ -5,11 +5,14 @@ import (
 	"database/sql"
 )
 
-type Querier interface {
-	CreateOrder(ctx context.Context, arg CreateOrderParams) error
+type UserQuerier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id string) (User, error)
+}
+
+type OrderQuerier interface {
+	CreateOrder(ctx context.Context, arg CreateOrderParams) error
 	ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order, error)
 	CountOrders(ctx context.Context, arg CountOrdersParams) (int64, error)
 	GetTotalOrders(ctx context.Context) (int64, error)
@@ -17,6 +20,11 @@ type Querier interface {
 	GetOrdersByCanal(ctx context.Context) ([]GetOrdersByCanalRow, error)
 	GetOrdersByFulfillmentType(ctx context.Context) ([]GetOrdersByFulfillmentTypeRow, error)
 	GetOrdersByProductType(ctx context.Context) ([]GetOrdersByProductTypeRow, error)
+}
+
+type Querier interface {
+	UserQuerier
+	OrderQuerier
 }
 
 var _ Querier = (*Queries)(nil)

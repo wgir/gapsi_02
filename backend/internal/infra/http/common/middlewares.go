@@ -75,13 +75,13 @@ func AuthMiddleware(tokenHelper *jwt.TokenHelper) func(next http.Handler) http.H
 			}
 
 			if tokenStr == "" {
-				RespondWithError(w, r, http.StatusUnauthorized, "unauthorized")
+				RespondWithCustomError(w, r, http.StatusUnauthorized, "unauthorized")
 				return
 			}
 
 			claims, err := tokenHelper.ValidateToken(tokenStr)
 			if err != nil || claims.Type != "access" {
-				RespondWithError(w, r, http.StatusUnauthorized, "unauthorized")
+				RespondWithCustomError(w, r, http.StatusUnauthorized, "unauthorized")
 				return
 			}
 

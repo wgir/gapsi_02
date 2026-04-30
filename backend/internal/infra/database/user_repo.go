@@ -7,10 +7,10 @@ import (
 )
 
 type userRepo struct {
-	queries Querier
+	queries UserQuerier
 }
 
-func NewUserRepository(q Querier) domain.UserRepository {
+func NewUserRepository(q UserQuerier) domain.UserRepository {
 	return &userRepo{queries: q}
 }
 

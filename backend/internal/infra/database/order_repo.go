@@ -7,10 +7,10 @@ import (
 )
 
 type orderRepo struct {
-	queries Querier
+	queries OrderQuerier
 }
 
-func NewOrderRepository(q Querier) domain.OrderRepository {
+func NewOrderRepository(q OrderQuerier) domain.OrderRepository {
 	return &orderRepo{queries: q}
 }
 

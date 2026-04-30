@@ -5,12 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/user/gapsi_orders_api/internal/domain"
 	"github.com/user/gapsi_orders_api/internal/infra/http/common"
 )
-
-var validate = validator.New()
 
 type AuthHandler struct {
 	authService domain.UserService
@@ -23,21 +20,12 @@ func NewAuthHandler(authService domain.UserService) *AuthHandler {
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	var req RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		common.RespondWithCustomError(w, r, http.StatusBadRequest, "cuerpo de la solicitud inválido")
 		return
 	}
 
-	if err := validate.Struct(req); err != nil {
-		if validationErrors, ok := err.(validator.ValidationErrors); ok {
-			for _, fieldError := range validationErrors {
-				if fieldError.Field() == "Email" && fieldError.Tag() == "required" {
-					common.RespondWithError(w, r, http.StatusNotFound, "el email esta vacio")
-					return
-				}
-			}
-		}
-		// Fallback for other validation errors
-		common.RespondWithError(w, r, http.StatusBadRequest, err.Error())
+	if err := req.Validate(); err != nil {
+		common.RespondWithCustomError(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -48,17 +36,11 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.authService.Register(r.Context(), req.Email, req.Password, role)
 	if err != nil {
-		if err.Error() == "el correo electrónico ya está registrado" {
-			common.RespondWithError(w, r, http.StatusBadRequest, err.Error())
-			return
-		}
-		common.RespondWithError(w, r, http.StatusInternalServerError, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	common.RespondWithJSON(w, http.StatusCreated, map[string]interface{}{
 		"id":    user.ID,
 		"email": user.Email,
 		"role":  user.Role,
@@ -68,48 +50,56 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		common.RespondWithError(w, r, http.StatusBadRequest, err.Error())
+		common.RespondWithCustomError(w, r, http.StatusBadRequest, "cuerpo de la solicitud inválido")
+		return
+	}
+
+	if err := req.Validate(); err != nil {
+		common.RespondWithCustomError(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	accessToken, refreshToken, err := h.authService.Login(r.Context(), req.Email, req.Password)
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusUnauthorized, "invalid credentials")
+		common.RespondWithError(w, r, err)
 		return
 	}
 
 	setTokenCookies(w, accessToken, refreshToken)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	common.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
 		"access_token":  accessToken,
-		"expires_in":    86400000, // 1 day in ms (example format matching requirements)
+		"expires_in":    86400000, // 1 day in ms
 		"refresh_token": refreshToken,
 	})
 }
 
 func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	var req RefreshRequest
-	// Try body first, fallback to cookie
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.RefreshToken == "" {
+	// Try body first
+	json.NewDecoder(r.Body).Decode(&req)
+
+	// Fallback to cookie if body is empty
+	if req.RefreshToken == "" {
 		if cookie, err := r.Cookie("refresh_token"); err == nil {
 			req.RefreshToken = cookie.Value
-		} else {
-			common.RespondWithError(w, r, http.StatusBadRequest, "refresh token required")
-			return
 		}
+	}
+
+	if err := req.Validate(); err != nil {
+		common.RespondWithCustomError(w, r, http.StatusBadRequest, err.Error())
+		return
 	}
 
 	accessToken, newRefreshToken, err := h.authService.RefreshToken(r.Context(), req.RefreshToken)
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusUnauthorized, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
 	setTokenCookies(w, accessToken, newRefreshToken)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	common.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
 		"access_token":  accessToken,
 		"expires_in":    86400000,
 		"refresh_token": newRefreshToken,
@@ -133,8 +123,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 	})
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	common.RespondWithJSON(w, http.StatusOK, map[string]string{
 		"message": "Logout exitoso",
 	})
 }
@@ -142,18 +131,17 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok {
-		common.RespondWithError(w, r, http.StatusUnauthorized, "unauthorized")
+		common.RespondWithCustomError(w, r, http.StatusUnauthorized, "no autorizado")
 		return
 	}
 
 	user, err := h.authService.GetMe(r.Context(), userID)
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusInternalServerError, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	common.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
 		"id":    user.ID,
 		"email": user.Email,
 		"role":  user.Role,

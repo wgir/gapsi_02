@@ -17,7 +17,7 @@ API desarrollada en Golang para la gestión y análisis estadístico de órdenes
    ```
 3. Ejecuta la aplicación:
    ```bash
-   go run cmd/api/main.go
+   go run ./cmd/api/
    ```
 La API iniciará en el puerto `8088` (ej. `http://localhost:8088`).
 

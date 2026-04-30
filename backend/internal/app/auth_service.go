@@ -45,7 +45,7 @@ func (s *AuthService) Register(ctx context.Context, email, password string, role
 
 	if err := s.repo.Create(ctx, user); err != nil {
 		if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "unique constraint") {
-			return nil, errors.New("el correo electrónico ya está registrado")
+			return nil, domain.ErrUserAlreadyExists
 		}
 		return nil, err
 	}
@@ -56,11 +56,11 @@ func (s *AuthService) Register(ctx context.Context, email, password string, role
 func (s *AuthService) Login(ctx context.Context, email, password string) (string, string, error) {
 	user, err := s.repo.GetByEmail(ctx, email)
 	if err != nil {
-		return "", "", errors.New("invalid credentials")
+		return "", "", domain.ErrInvalidCredentials
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
-		return "", "", errors.New("invalid credentials")
+		return "", "", domain.ErrInvalidCredentials
 	}
 
 	accessToken, err := s.tokenHelper.GenerateToken(user.ID, user.Email, string(user.Role), "access", s.accessTTL)
@@ -79,13 +79,13 @@ func (s *AuthService) Login(ctx context.Context, email, password string) (string
 func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (string, string, error) {
 	claims, err := s.tokenHelper.ValidateToken(refreshToken)
 	if err != nil || claims.Type != "refresh" {
-		return "", "", errors.New("invalid refresh token")
+		return "", "", domain.ErrInvalidToken
 	}
 
 	// Double check user still exists
 	user, err := s.repo.GetByID(ctx, claims.UserID)
 	if err != nil {
-		return "", "", errors.New("user not found")
+		return "", "", domain.ErrUserNotFound
 	}
 
 	accessToken, err := s.tokenHelper.GenerateToken(user.ID, user.Email, string(user.Role), "access", s.accessTTL)
