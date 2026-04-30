@@ -1,6 +1,7 @@
 'use client';
 
 import { useStats } from '@/hooks/useStats';
+import { AlertCircle } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -19,13 +20,28 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1'
 
 export default function OrdersCharts() {
   // Charts now use empty filters to always show global data
-  const { data, isLoading } = useStats();
+  const { data, isLoading, isError } = useStats();
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[400px] animate-pulse"></div>
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-[400px] animate-pulse"></div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-red-50 p-6 rounded-xl shadow-sm border border-red-100 h-[400px] flex flex-col items-center justify-center text-red-500">
+          <AlertCircle className="h-10 w-10 mb-3 opacity-50" />
+          <span className="text-sm font-medium">Error al cargar gráficos</span>
+        </div>
+        <div className="bg-red-50 p-6 rounded-xl shadow-sm border border-red-100 h-[400px] flex flex-col items-center justify-center text-red-500">
+          <AlertCircle className="h-10 w-10 mb-3 opacity-50" />
+          <span className="text-sm font-medium">Error al cargar gráficos</span>
+        </div>
       </div>
     );
   }

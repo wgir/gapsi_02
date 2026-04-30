@@ -22,7 +22,7 @@ export default function DashboardLayout({
               Gapsi Admin
             </h1>
           </div>
-          
+
           <nav className="flex-1 p-4 space-y-1">
             <Link
               href="/dashboard"
@@ -31,23 +31,6 @@ export default function DashboardLayout({
               <LayoutDashboard className="h-5 w-5" />
               Dashboard
             </Link>
-            <Link
-              href="#"
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Órdenes
-            </Link>
-            <Link
-              href="#"
-              className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
-            >
-              <BarChart3 className="h-5 w-5" />
-              Estadísticas
-            </Link>
-          </nav>
-          
-          <div className="p-4 border-t border-gray-100">
             <button
               onClick={logout}
               className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -55,6 +38,10 @@ export default function DashboardLayout({
               <LogOut className="h-5 w-5" />
               Cerrar sesión
             </button>
+          </nav>
+
+          <div className="p-4 border-t border-gray-100">
+
           </div>
         </div>
       </aside>

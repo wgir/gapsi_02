@@ -1,11 +1,11 @@
 'use client';
 
 import { useStats } from '@/hooks/useStats';
-import { ShoppingBag, AlertTriangle, TrendingUp, Package } from 'lucide-react';
+import { ShoppingBag, AlertTriangle, TrendingUp, Package, AlertCircle } from 'lucide-react';
 
 export default function StatsCards() {
   // Stats cards now use empty filters to always show global stats
-  const { data, isLoading } = useStats();
+  const { data, isLoading, isError } = useStats();
 
   if (isLoading) {
     return (
@@ -14,6 +14,19 @@ export default function StatsCards() {
           <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 animate-pulse">
             <div className="h-4 w-24 bg-gray-200 rounded mb-4"></div>
             <div className="h-8 w-16 bg-gray-200 rounded"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-red-50 p-6 rounded-xl shadow-sm border border-red-100 flex flex-col items-center justify-center text-red-500 h-[120px]">
+            <AlertCircle className="h-8 w-8 mb-2 opacity-50" />
+            <span className="text-xs font-medium text-center">Error al cargar</span>
           </div>
         ))}
       </div>

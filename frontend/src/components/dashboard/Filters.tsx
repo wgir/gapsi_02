@@ -1,12 +1,12 @@
 'use client';
 
 import { useFilterStore } from '@/store/useFilterStore';
-import { Search, RotateCcw } from 'lucide-react';
+import { Search, RotateCcw, AlertCircle } from 'lucide-react';
 import { useFilters } from '@/hooks/useFilters';
 
 export default function Filters() {
   const { filters, setFilter, resetFilters } = useFilterStore();
-  const { data: filterOptions, isLoading } = useFilters();
+  const { data: filterOptions, isLoading, isError } = useFilters();
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -26,12 +26,21 @@ export default function Filters() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center text-red-500 py-12">
+        <AlertCircle className="h-10 w-10 mb-3 opacity-50" />
+        <span className="text-sm font-medium">Error al cargar los filtros</span>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
           <Search className="h-4 w-4" />
-          Filtros Globales
+          Filtros Listado de Órdenes
         </h3>
         <button
           onClick={resetFilters}
@@ -41,7 +50,7 @@ export default function Filters() {
           Restablecer
         </button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label htmlFor="canal" className="block text-xs font-medium text-gray-500 mb-1">

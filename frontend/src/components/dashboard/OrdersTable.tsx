@@ -3,13 +3,13 @@
 import { useOrders } from '@/hooks/useOrders';
 import { Order } from '@/types/order';
 import { useFilterStore } from '@/store/useFilterStore';
-import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Eye, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function OrdersTable() {
   const { filters, setPage } = useFilterStore();
-  const { data: ordersData, isLoading } = useOrders(filters);
+  const { data: ordersData, isLoading, isError } = useOrders(filters);
 
   if (isLoading) {
     return (
@@ -41,6 +41,15 @@ export default function OrdersTable() {
             </tbody>
           </table>
         </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col items-center justify-center text-red-500 py-20">
+        <AlertCircle className="h-12 w-12 mb-3 opacity-50" />
+        <span className="text-base font-medium">Error al cargar las órdenes</span>
       </div>
     );
   }
