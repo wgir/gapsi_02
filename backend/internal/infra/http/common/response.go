@@ -44,3 +44,8 @@ func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(payload)
 }
+
+func DecodeJSON(r *http.Request, v interface{}) error {
+	defer r.Body.Close()
+	return json.NewDecoder(r.Body).Decode(v)
+}

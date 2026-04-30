@@ -33,10 +33,6 @@ func SetupRouter(
 		r.Route("/orders", func(r chi.Router) {
 			orders.RegisterOrderRoutes(r, orderHandler, tokenHelper)
 		})
-
-		r.Route("/stats", func(r chi.Router) {
-			orders.RegisterStatsRoutes(r, orderHandler, tokenHelper)
-		})
 	})
 
 	return r

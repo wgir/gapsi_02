@@ -1,7 +1,7 @@
 Desarrollo de Frontend - Dashboard de Órdenes (React 19 + Next.js 16)
 🎯 Objetivo
 
-Construir un dashboard web profesional utilizando React + Next.js que permita visualizar, filtrar y analizar órdenes de venta en tiempo real, consumiendo una API backend.
+Construir un dashboard web profesional utilizando React 19 + Next.js 16 que permita visualizar, filtrar y analizar órdenes de venta en tiempo real, consumiendo una API backend.
 
 🧱 Stack Tecnológico
 Framework: Next.js (App Router recomendado)

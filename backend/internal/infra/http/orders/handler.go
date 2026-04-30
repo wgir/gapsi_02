@@ -2,7 +2,6 @@ package orders
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/user/gapsi_orders_api/internal/domain"
 	"github.com/user/gapsi_orders_api/internal/infra/http/common"
@@ -17,24 +16,17 @@ func NewOrderHandler(orderService domain.OrderService) *OrderHandler {
 }
 
 func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-
-	page, _ := strconv.Atoi(query.Get("page"))
-	if page < 1 {
-		page = 1
-	}
-	pageSize, _ := strconv.Atoi(query.Get("page_size"))
-	if pageSize < 1 {
-		pageSize = 10
+	var filters domain.OrderFilters
+	if err := common.DecodeJSON(r, &filters); err != nil {
+		// If body is empty or invalid, we use default filters
+		filters = domain.OrderFilters{}
 	}
 
-	filters := domain.OrderFilters{
-		Canal:           query.Get("canal"),
-		Company:         query.Get("company"),
-		FulfillmentType: query.Get("fulfillment_type"),
-		ProductType:     query.Get("product_type"),
-		Page:            page,
-		PageSize:        pageSize,
+	if filters.Page < 1 {
+		filters.Page = 1
+	}
+	if filters.PageSize < 1 {
+		filters.PageSize = 10
 	}
 
 	orders, total, err := h.orderService.ListOrders(r.Context(), filters)
@@ -46,8 +38,8 @@ func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
 	common.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
 		"data":      orders,
 		"total":     total,
-		"page":      page,
-		"page_size": pageSize,
+		"page":      filters.Page,
+		"page_size": filters.PageSize,
 	})
 }
 
