@@ -1,6 +1,7 @@
 'use client';
 
 import { useOrders } from '@/hooks/useOrders';
+import { Order } from '@/types/order';
 import { useFilterStore } from '@/store/useFilterStore';
 import { ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -20,7 +21,7 @@ export default function OrdersTable() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                {[...Array(9)].map((_, i) => (
+                {[...Array(8)].map((_, i) => (
                   <th key={i} className="px-6 py-4">
                     <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
                   </th>
@@ -30,7 +31,7 @@ export default function OrdersTable() {
             <tbody>
               {[...Array(5)].map((_, i) => (
                 <tr key={i} className="border-b border-gray-100">
-                  {[...Array(9)].map((_, j) => (
+                  {[...Array(8)].map((_, j) => (
                     <td key={j} className="px-6 py-4">
                       <div className="h-4 w-full bg-gray-100 rounded animate-pulse"></div>
                     </td>
@@ -98,18 +99,17 @@ export default function OrdersTable() {
               <th className="px-6 py-4">SKU</th>
               <th className="px-6 py-4">Fecha</th>
               <th className="px-6 py-4">Estado</th>
-              <th className="px-6 py-4 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                   No se encontraron órdenes.
                 </td>
               </tr>
             ) : (
-              orders.map((order) => {
+              orders.map((order: Order) => {
                 const purchaseDate = parseTimestamp(order.fechaCompra);
                 const status = order.orderStatus?.description || (order.error ? 'Error' : 'Pendiente');
                 const statusCode = order.orderStatus?.code || (order.error ? 'ERROR' : 'PENDIENTE');
@@ -147,11 +147,6 @@ export default function OrdersTable() {
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(statusCode)}`}>
                         {status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors">
-                        <Eye className="h-4 w-4" />
-                      </button>
                     </td>
                   </tr>
                 );

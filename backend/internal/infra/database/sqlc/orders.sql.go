@@ -102,7 +102,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) error 
 }
 
 const getDistinctCanals = `-- name: GetDistinctCanals :many
-SELECT DISTINCT canal FROM orders WHERE canal <> '' ORDER BY canal
+SELECT DISTINCT canal FROM orders ORDER BY canal
 `
 
 func (q *Queries) GetDistinctCanals(ctx context.Context) ([]string, error) {
@@ -129,7 +129,7 @@ func (q *Queries) GetDistinctCanals(ctx context.Context) ([]string, error) {
 }
 
 const getDistinctCompanies = `-- name: GetDistinctCompanies :many
-SELECT DISTINCT company FROM orders WHERE company <> '' ORDER BY company
+SELECT DISTINCT company FROM orders ORDER BY company
 `
 
 func (q *Queries) GetDistinctCompanies(ctx context.Context) ([]string, error) {
@@ -156,7 +156,7 @@ func (q *Queries) GetDistinctCompanies(ctx context.Context) ([]string, error) {
 }
 
 const getDistinctFulfillmentTypes = `-- name: GetDistinctFulfillmentTypes :many
-SELECT DISTINCT fulfillment_type FROM orders WHERE fulfillment_type IS NOT NULL AND fulfillment_type <> '' ORDER BY fulfillment_type
+SELECT DISTINCT fulfillment_type FROM orders ORDER BY fulfillment_type
 `
 
 func (q *Queries) GetDistinctFulfillmentTypes(ctx context.Context) ([]sql.NullString, error) {
@@ -183,7 +183,7 @@ func (q *Queries) GetDistinctFulfillmentTypes(ctx context.Context) ([]sql.NullSt
 }
 
 const getDistinctProductTypes = `-- name: GetDistinctProductTypes :many
-SELECT DISTINCT product_type FROM orders WHERE product_type IS NOT NULL AND product_type <> '' ORDER BY product_type
+SELECT DISTINCT product_type FROM orders ORDER BY product_type
 `
 
 func (q *Queries) GetDistinctProductTypes(ctx context.Context) ([]sql.NullString, error) {

@@ -149,15 +149,11 @@ func (r *orderRepo) GetFilters(ctx context.Context) (*domain.OrderFiltersOptions
 	}
 
 	for _, f := range fTypes {
-		if f.Valid && f.String != "" {
-			options.FulfillmentTypes = append(options.FulfillmentTypes, f.String)
-		}
+		options.FulfillmentTypes = append(options.FulfillmentTypes, f.String)
 	}
 
 	for _, p := range pTypes {
-		if p.Valid && p.String != "" {
-			options.ProductTypes = append(options.ProductTypes, p.String)
-		}
+		options.ProductTypes = append(options.ProductTypes, p.String)
 	}
 
 	return options, nil

@@ -15,10 +15,6 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Global stats and charts stay at the top and don't depend on table filters */}
-      <StatsCards />
-      <OrdersCharts />
-
       {/* Table filters are now placed right above the table */}
       <div className="space-y-6">
         <div className="flex flex-col gap-4">
@@ -27,6 +23,9 @@ export default function DashboardPage() {
         </div>
         <OrdersTable />
       </div>
+      {/* Global stats and charts stay at the top and don't depend on table filters */}
+      <StatsCards />
+      <OrdersCharts />
     </div>
   );
 }

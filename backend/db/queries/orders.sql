@@ -41,13 +41,13 @@ SELECT fulfillment_type, COUNT(*) as count FROM orders GROUP BY fulfillment_type
 SELECT product_type, COUNT(*) as count FROM orders GROUP BY product_type;
 
 -- name: GetDistinctCanals :many
-SELECT DISTINCT canal FROM orders WHERE canal <> '' ORDER BY canal;
+SELECT DISTINCT canal FROM orders ORDER BY canal;
 
 -- name: GetDistinctCompanies :many
-SELECT DISTINCT company FROM orders WHERE company <> '' ORDER BY company;
+SELECT DISTINCT company FROM orders ORDER BY company;
 
 -- name: GetDistinctFulfillmentTypes :many
-SELECT DISTINCT fulfillment_type FROM orders WHERE fulfillment_type IS NOT NULL AND fulfillment_type <> '' ORDER BY fulfillment_type;
+SELECT DISTINCT fulfillment_type FROM orders ORDER BY fulfillment_type;
 
 -- name: GetDistinctProductTypes :many
-SELECT DISTINCT product_type FROM orders WHERE product_type IS NOT NULL AND product_type <> '' ORDER BY product_type;
+SELECT DISTINCT product_type FROM orders ORDER BY product_type;
