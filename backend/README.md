@@ -19,7 +19,7 @@ API desarrollada en Golang para la gestión y análisis estadístico de órdenes
    ```bash
    go run ./cmd/api/
    ```
-La API iniciará en el puerto `8088` (ej. `http://localhost:8088`).
+La API iniciará en el puerto `8090` (ej. `http://localhost:8090`).
 
 ## 📚 Migraciones con sqlc
 
