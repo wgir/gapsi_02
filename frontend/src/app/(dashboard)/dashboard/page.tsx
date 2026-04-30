@@ -15,13 +15,18 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      <Filters />
-      
+      {/* Global stats and charts stay at the top and don't depend on table filters */}
       <StatsCards />
-
       <OrdersCharts />
 
-      <OrdersTable />
+      {/* Table filters are now placed right above the table */}
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4">
+          <h3 className="text-lg font-semibold text-gray-900">Gestión de Pedidos</h3>
+          <Filters />
+        </div>
+        <OrdersTable />
+      </div>
     </div>
   );
 }

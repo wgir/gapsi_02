@@ -1,12 +1,11 @@
 'use client';
 
 import { useStats } from '@/hooks/useStats';
-import { useFilterStore } from '@/store/useFilterStore';
 import { ShoppingBag, AlertTriangle, TrendingUp, Package } from 'lucide-react';
 
 export default function StatsCards() {
-  const { filters } = useFilterStore();
-  const { data, isLoading } = useStats(filters);
+  // Stats cards now use empty filters to always show global stats
+  const { data, isLoading } = useStats();
 
   if (isLoading) {
     return (

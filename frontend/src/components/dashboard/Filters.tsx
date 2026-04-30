@@ -2,17 +2,32 @@
 
 import { useFilterStore } from '@/store/useFilterStore';
 import { Search, RotateCcw } from 'lucide-react';
+import { useFilters } from '@/hooks/useFilters';
 
 export default function Filters() {
   const { filters, setFilter, resetFilters } = useFilterStore();
+  const { data: filterOptions, isLoading } = useFilters();
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilter(name as any, value);
   };
 
+  if (isLoading) {
+    return (
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 animate-pulse">
+        <div className="h-4 w-24 bg-gray-200 rounded mb-6"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-10 bg-gray-100 rounded-lg"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
           <Search className="h-4 w-4" />
@@ -40,10 +55,9 @@ export default function Filters() {
             className="block w-full rounded-lg border border-gray-200 py-2.5 px-3 text-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50"
           >
             <option value="">Todos los canales</option>
-            <option value="APP">APP</option>
-            <option value="WEB">WEB</option>
-            <option value="MOBILE">MOBILE</option>
-            <option value="APV AND">APV AND</option>
+            {filterOptions?.channels?.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
           </select>
         </div>
 
@@ -59,8 +73,9 @@ export default function Filters() {
             className="block w-full rounded-lg border border-gray-200 py-2.5 px-3 text-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50"
           >
             <option value="">Todas las compañías</option>
-            <option value="BODEGA-01">BODEGA-01</option>
-            <option value="LIVERPOOL">LIVERPOOL</option>
+            {filterOptions?.companies?.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
           </select>
         </div>
 
@@ -76,9 +91,9 @@ export default function Filters() {
             className="block w-full rounded-lg border border-gray-200 py-2.5 px-3 text-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50"
           >
             <option value="">Todos los tipos</option>
-            <option value="FFW">FFW</option>
-            <option value="Liverpool_CNC_PICK_PACK">PICK PACK</option>
-            <option value="Fulfillment_Type_Liverpool">LIVERPOOL FF</option>
+            {filterOptions?.fulfillmentTypes?.map((f) => (
+              <option key={f} value={f}>{f}</option>
+            ))}
           </select>
         </div>
 
@@ -94,9 +109,9 @@ export default function Filters() {
             className="block w-full rounded-lg border border-gray-200 py-2.5 px-3 text-sm focus:border-blue-500 focus:ring-blue-500 bg-gray-50"
           >
             <option value="">Todos los productos</option>
-            <option value="FOOD">FOOD</option>
-            <option value="BT">BIG TICKET</option>
-            <option value="SL">SOFT LINE</option>
+            {filterOptions?.productTypes?.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
           </select>
         </div>
       </div>

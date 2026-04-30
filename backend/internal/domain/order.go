@@ -30,12 +30,12 @@ type Order struct {
 }
 
 type OrderFilters struct {
-	Canal           string
-	Company         string
-	FulfillmentType string
-	ProductType     string
-	Page            int
-	PageSize        int
+	Canal           string `json:"canal"`
+	Company         string `json:"company"`
+	FulfillmentType string `json:"fulfillment_type"`
+	ProductType     string `json:"product_type"`
+	Page            int    `json:"page"`
+	PageSize        int    `json:"page_size"`
 }
 
 type OrderStats struct {
@@ -46,12 +46,21 @@ type OrderStats struct {
 	PercentageWithErrors   float64          `json:"percentage_with_errors"`
 }
 
+type OrderFiltersOptions struct {
+	Channels         []string `json:"channels"`
+	Companies        []string `json:"companies"`
+	FulfillmentTypes []string `json:"fulfillmentTypes"`
+	ProductTypes     []string `json:"productTypes"`
+}
+
 type OrderRepository interface {
 	List(ctx context.Context, filters OrderFilters) ([]Order, int64, error)
 	GetStats(ctx context.Context) (*OrderStats, error)
+	GetFilters(ctx context.Context) (*OrderFiltersOptions, error)
 }
 
 type OrderService interface {
 	ListOrders(ctx context.Context, filters OrderFilters) ([]Order, int64, error)
 	GetStats(ctx context.Context) (*OrderStats, error)
+	GetFilters(ctx context.Context) (*OrderFiltersOptions, error)
 }

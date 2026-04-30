@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/user/gapsi_orders_api/internal/domain"
 	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
@@ -21,8 +22,8 @@ func (r *orderRepo) List(ctx context.Context, filters domain.OrderFilters) ([]do
 	dbOrders, err := r.queries.ListOrders(ctx, sqlc.ListOrdersParams{
 		Canal:           filters.Canal,
 		Company:         filters.Company,
-		FulfillmentType: filters.FulfillmentType,
-		ProductType:     filters.ProductType,
+		FulfillmentType: sql.NullString{String: filters.FulfillmentType, Valid: filters.FulfillmentType != ""},
+		ProductType:     sql.NullString{String: filters.ProductType, Valid: filters.ProductType != ""},
 		Limit:           int32(filters.PageSize),
 		Offset:          int32(offset),
 	})
@@ -33,8 +34,8 @@ func (r *orderRepo) List(ctx context.Context, filters domain.OrderFilters) ([]do
 	count, err := r.queries.CountOrders(ctx, sqlc.CountOrdersParams{
 		Canal:           filters.Canal,
 		Company:         filters.Company,
-		FulfillmentType: filters.FulfillmentType,
-		ProductType:     filters.ProductType,
+		FulfillmentType: sql.NullString{String: filters.FulfillmentType, Valid: filters.FulfillmentType != ""},
+		ProductType:     sql.NullString{String: filters.ProductType, Valid: filters.ProductType != ""},
 	})
 	if err != nil {
 		return nil, 0, err
@@ -119,4 +120,45 @@ func (r *orderRepo) GetStats(ctx context.Context) (*domain.OrderStats, error) {
 	}
 
 	return stats, nil
+}
+
+func (r *orderRepo) GetFilters(ctx context.Context) (*domain.OrderFiltersOptions, error) {
+	canals, err := r.queries.GetDistinctCanals(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	companies, err := r.queries.GetDistinctCompanies(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	fTypes, err := r.queries.GetDistinctFulfillmentTypes(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	pTypes, err := r.queries.GetDistinctProductTypes(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	options := &domain.OrderFiltersOptions{
+		Channels:  canals,
+		Companies: companies,
+	}
+
+	for _, f := range fTypes {
+		if f.Valid && f.String != "" {
+			options.FulfillmentTypes = append(options.FulfillmentTypes, f.String)
+		}
+	}
+
+	for _, p := range pTypes {
+		if p.Valid && p.String != "" {
+			options.ProductTypes = append(options.ProductTypes, p.String)
+		}
+	}
+
+	return options, nil
 }

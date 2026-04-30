@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/user/gapsi_orders_api/internal/domain"
 	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
 )
@@ -30,7 +31,7 @@ func (r *userRepo) Create(ctx context.Context, user *domain.User) error {
 		return err
 	}
 
-	user.ID = dbUser.ID
+	user.ID = dbUser.ID.String()
 	user.CreatedAt = dbUser.CreatedAt
 	user.UpdatedAt = dbUser.UpdatedAt
 	return nil
@@ -45,7 +46,11 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.User, 
 }
 
 func (r *userRepo) GetByID(ctx context.Context, id string) (*domain.User, error) {
-	dbUser, err := r.queries.GetUserByID(ctx, id)
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+	dbUser, err := r.queries.GetUserByID(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +63,7 @@ func mapDBUserToDomain(dbUser sqlc.User) *domain.User {
 		role = domain.RoleAdmin
 	}
 	return &domain.User{
-		ID:           dbUser.ID,
+		ID:           dbUser.ID.String(),
 		Email:        dbUser.Email,
 		PasswordHash: dbUser.PasswordHash,
 		Role:         role,

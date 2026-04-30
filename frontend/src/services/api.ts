@@ -28,13 +28,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
-      // Here you could implement refresh token logic if the API supports it
-      // For now, we'll just redirect to login or handle it in the hook
+    if (error.response?.status === 401) {
+      if (typeof window !== 'undefined') {
+        // Prevent redirect loop if already on login page or already logging out
+        if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/logout')) {
+          // Redirect to logout route to clear httpOnly cookies server-side
+          window.location.href = '/api/auth/logout';
+        }
+      }
     }
 
     return Promise.reject(error);

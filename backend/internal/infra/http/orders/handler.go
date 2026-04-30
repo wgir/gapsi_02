@@ -52,3 +52,13 @@ func (h *OrderHandler) Stats(w http.ResponseWriter, r *http.Request) {
 
 	common.RespondWithJSON(w, http.StatusOK, stats)
 }
+
+func (h *OrderHandler) GetFilters(w http.ResponseWriter, r *http.Request) {
+	options, err := h.orderService.GetFilters(r.Context())
+	if err != nil {
+		common.RespondWithError(w, r, err)
+		return
+	}
+
+	common.RespondWithJSON(w, http.StatusOK, options)
+}

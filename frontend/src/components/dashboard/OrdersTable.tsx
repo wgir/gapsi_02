@@ -20,7 +20,7 @@ export default function OrdersTable() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                {[...Array(6)].map((_, i) => (
+                {[...Array(9)].map((_, i) => (
                   <th key={i} className="px-6 py-4">
                     <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
                   </th>
@@ -30,7 +30,7 @@ export default function OrdersTable() {
             <tbody>
               {[...Array(5)].map((_, i) => (
                 <tr key={i} className="border-b border-gray-100">
-                  {[...Array(6)].map((_, j) => (
+                  {[...Array(9)].map((_, j) => (
                     <td key={j} className="px-6 py-4">
                       <div className="h-4 w-full bg-gray-100 rounded animate-pulse"></div>
                     </td>
@@ -68,7 +68,6 @@ export default function OrdersTable() {
 
   const parseTimestamp = (timestampStr: string) => {
     if (!timestampStr) return null;
-    // Handle "__Timestamp__2024-12-24T14:34:07.656Z"
     const cleanDate = timestampStr.replace('__Timestamp__', '');
     try {
       const date = new Date(cleanDate);
@@ -93,17 +92,19 @@ export default function OrdersTable() {
             <tr>
               <th className="px-6 py-4">No. Pedido</th>
               <th className="px-6 py-4">Canal</th>
+              <th className="px-6 py-4">Compañía</th>
+              <th className="px-6 py-4">Producto</th>
+              <th className="px-6 py-4">Fulfillment</th>
               <th className="px-6 py-4">SKU</th>
-              <th className="px-6 py-4">Fecha Compra</th>
+              <th className="px-6 py-4">Fecha</th>
               <th className="px-6 py-4">Estado</th>
-              <th className="px-6 py-4">Cantidad</th>
               <th className="px-6 py-4 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                   No se encontraron órdenes.
                 </td>
               </tr>
@@ -119,25 +120,33 @@ export default function OrdersTable() {
                       {order.noPedido || order.code || 'N/A'}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded-md bg-gray-100 text-gray-600 text-xs font-medium">
+                      <span className="px-2 py-1 rounded-md bg-gray-100 text-gray-600 text-[10px] font-medium uppercase">
                         {order.canal}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {order.company}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-[10px] font-medium uppercase">
+                        {order.productType}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">
+                      {order.fulfillmentType}
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-gray-900 font-medium">{order.sku}</span>
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
                       {purchaseDate 
-                        ? format(purchaseDate, 'dd MMM, yyyy', { locale: es })
+                        ? format(purchaseDate, 'dd/MM/yy', { locale: es })
                         : 'N/A'}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${getStatusColor(statusCode)}`}>
                         {status}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 font-semibold text-gray-900">
-                      {order.cantidad || 0}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button className="p-1.5 text-gray-400 hover:text-blue-600 transition-colors">

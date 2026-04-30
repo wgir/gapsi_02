@@ -1,7 +1,6 @@
 'use client';
 
 import { useStats } from '@/hooks/useStats';
-import { useFilterStore } from '@/store/useFilterStore';
 import {
   BarChart,
   Bar,
@@ -19,8 +18,8 @@ import {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1'];
 
 export default function OrdersCharts() {
-  const { filters } = useFilterStore();
-  const { data, isLoading } = useStats(filters);
+  // Charts now use empty filters to always show global data
+  const { data, isLoading } = useStats();
 
   if (isLoading) {
     return (
