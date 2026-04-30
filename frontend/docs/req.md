@@ -1,25 +1,28 @@
-# 🧱 Frontend Application Prompt  
-**Next.js (Latest) + Tailwind CSS**
+Desarrollo de Frontend - Dashboard de Órdenes (React 19 + Next.js 16)
+🎯 Objetivo
 
-## 🎯 Objective
-Build a modern frontend web application using the **latest version of Next.js (App Router)** and **Tailwind CSS**, with public pages and an authenticated dashboard layout.
+Construir un dashboard web profesional utilizando React + Next.js que permita visualizar, filtrar y analizar órdenes de venta en tiempo real, consumiendo una API backend.
 
----
+🧱 Stack Tecnológico
+Framework: Next.js (App Router recomendado)
+Lenguaje: TypeScript
+Estilos: Tailwind CSS
+Manejo de datos: React Query (TanStack Query)
+Gráficos: Recharts o Chart.js
+Manejo de estado global: Zustand o Context API
+Cliente HTTP: fetch o Axios
+🔐 Autenticación
 
-## 🛠️ Tech Stack
-- **Next.js** (latest version, App Router)
-- **React** (functional components)
-- **Tailwind CSS**
-- **TypeScript** (preferred)
+Implementar un módulo de autenticación basado en JWT:
 
----
+Requisitos:
+Página /login
+Formulario: email + password
+Manejo de sesión con cookies HTTP-only
+Redirección a /dashboard tras login exitoso
+Protección de rutas (middleware o lógica en layout)
 
-## 🌐 Public Area (Unauthenticated Users)
-
-Se debe visualizar una pantalla de login que permita el acceso al sistema. Este login se debe ubicar en 
-app/(auth)/login/page.tsx
-
-Que consuma el endpoint:
+endpoint:
 
 POST http://localhost:8090/v1/auth/login
 
@@ -33,7 +36,7 @@ El endpoint retorna el siguiente JSON:
 
 ---
 
-## Requisitos funcionales
+## Requisitos funcionales del login
 
 1. Usar la page app/(auth)/login/page.tsx para la integracion
 
@@ -56,60 +59,118 @@ El endpoint retorna el siguiente JSON:
    - 500
 
 
-### Public Routes
-| Route | Description |
-|------|------------|
-| `/login` | Login page |
+🔑 Comportamiento inicial
+La pantalla inicial de la aplicación debe ser /login
+Si el usuario NO está autenticado, siempre debe ser redirigido a /login
+Si el usuario YA está autenticado, debe ser redirigido automáticamente a /dashboard
 
-- **Login** must be publicly accessible.
+🧭 Estructura de Rutas
+/app
+  /login
+  /dashboard
+    page.tsx
+    layout.tsx
+/components
+/hooks
+/services
+/types
 
----
+🖥️ Dashboard (Vista Principal)
 
-## 🔐 Authentication Flow
-- Login page with:
-  - Email
-  - Password
-- Authentication call to backend to confirm the credentials.
-- On successful login:
-  - Redirect the user to `/dashboard`
-  - Switch to an authenticated layout
+Construir una single-page dashboard en /dashboard con los siguientes módulos:
 
----
+1. 🔍 Filtros (Globales)
+canal
+compañía
+fulfillmentType
+productType
 
-## 📊 Authenticated Area (After Login)
+📌 Deben afectar:
 
-### Layout
-- **Header** at the top
-  - Logo aligned to the left
-  - Logout
-- **Main content area** debajo del header, must be **responsive** and **collapsible on mobile**
+tabla
+gráficos
+estadísticas
+2. 📊 Estadísticas (KPIs)
 
-### Protected Routes
-| Route | Description |
-|------|------------|
-| `/orders` | Orders list |
+Consumir:
 
+GET /api/stats
 
----
+Mostrar:
 
-## 🧩 Architectural Requirements
-- Use **Next.js `layout.tsx`** to separate:
-  - Public layout
-  - Authenticated layout
-- Reusable components:
-  - Header
-  - Navbar
-- Clean folder structure
-- Responsive design (desktop & mobile)
-- Use **Tailwind utility classes only**
-- No custom CSS files
+Total de órdenes
+% de órdenes con error
+Desglose por canal
+Desglose por tipo de entrega
+Desglose por tipo de producto
+3. 📈 Gráficos
 
----
+Mínimo 2 gráficos:
 
-## 📊 Orders
+Órdenes por canal
+Órdenes por tipo de entrega o producto
 
-- El ordenes se devem poder visualizar en una tabla, consumiendo el endpoint:
+📌 Deben actualizarse en tiempo real con los filtros
 
+el endpoint es:
+GET http://localhost:8090/v1/orders/stats
+
+ejemplo 
+```
+'http://localhost:8090/v1/orders/stats' \
+  --header 'Content-Type: application/json' \
+  --header 'Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTY2MjIwOWEtODg3NC00Y2IxLWI0YzQtYWZjNTA0OGMzODFjIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3Nzc1Nzk3OTIsImlhdCI6MTc3NzU3ODg5Mn0.ly8LXA4dLhZYxDIvOPUKjjgKF4qkZfs-xHdTU5uf8_Y; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTY2MjIwOWEtODg3NC00Y2IxLWI0YzQtYWZjNTA0OGMzODFjIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsInR5cGUiOiJyZWZyZXNoIiwiZXhwIjoxNzc4MTgzNjkyLCJpYXQiOjE3Nzc1Nzg4OTJ9._QErTQlt3qewRFZGjC6SMvmV9-B9keyy5lCwt-mG2cs'`
+````
+
+Response :
+
+```json
+{
+    "total_orders": 59848,
+    "breakdown_by_canal": {
+        "": 1,
+        "APP": 6069,
+        "APV": 1,
+        "APV AND": 24008,
+        "MOBILE": 1237,
+        "WEB": 28532
+    },
+    "breakdown_by_fulfillment": {
+        "": 22439,
+        "Fulfillment_Type_Liverpool": 30360,
+        "Liverpool_CNC_PICK_PACK": 7049
+    },
+    "breakdown_by_product_type": {
+        "": 22439,
+        "BT": 345,
+        "Big Ticket": 9431,
+        "SL": 1226,
+        "Soft Line": 26407
+    },
+    "percentage_with_errors": 12.018780911642828
+}
+```
+
+4. 📋 Tabla de Órdenes
+
+Consumir:
+
+GET /api/orders
+
+Requisitos:
+
+Paginación obligatoria
+Columnas:
+noPedido
+canal
+sku
+fechaEstimada
+tipoEntrega
+tipoProducto
+cantidad
+fechaCompra
+
+Endpoint: 
 GET http://localhost:8090/v1/orders?page=1&page_size=5&canal=APP&company=1&fulfillment_type=FFW&&product_type=1
 
 El endpoint retorna el siguiente JSON:
@@ -277,63 +338,56 @@ El endpoint retorna el siguiente JSON:
   }
 }
 
-- La Tabla con paginación debe consumir el endpoint del backend (GET http://localhost:8090/v1/orders?page=1&page_size=5&canal=APP&company=1&fulfillment_type=FFW&&product_type=1). Debe mostrar: noPedido, canal, sku, fechaEstimada, tipo de entrega, tipo de producto, cantidad y fechaCompra. 
+🔄 Manejo de Estado
+Centralizar filtros en estado global
+Usar React Query para:
+cache
+refetch automático
+sincronización con filtros
+🧩 Arquitectura sugerida
+/components
+  /filters
+  /charts
+  /table
+  /ui
+/hooks
+  useOrders.ts
+  useStats.ts
+  useFilters.ts
+/services
+  api.ts
+/types
+  order.ts
+  stats.ts
+🎨 UI/UX
+Diseño limpio, moderno y responsivo
+Mobile-first
+Uso consistente de spacing y tipografía
+Skeleton loaders / loading states
+Manejo de errores visual
+⚡ Requisitos de Calidad
+Código modular y escalable
+Uso de TypeScript estricto
+Separación clara de responsabilidades
+Evitar lógica duplicada
+Manejo correcto de loading/error states
+🚀 Bonus (Opcional pero recomendado)
+Dark mode
+Persistencia de filtros en URL (query params)
+Debounce en filtros
+Exportación de datos (CSV)
+Testing básico (React Testing Library)
+🏁 Resultado Esperado
 
+Un dashboard interactivo donde:
 
-## 📊 Orders Statistics 
-
-el endpoint es:
-GET http://localhost:8090/v1/orders/stats
-
-ejemplo 
-```
-'http://localhost:8090/v1/orders/stats' \
-  --header 'Content-Type: application/json' \
-  --header 'Cookie: access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTY2MjIwOWEtODg3NC00Y2IxLWI0YzQtYWZjNTA0OGMzODFjIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3Nzc1Nzk3OTIsImlhdCI6MTc3NzU3ODg5Mn0.ly8LXA4dLhZYxDIvOPUKjjgKF4qkZfs-xHdTU5uf8_Y; refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTY2MjIwOWEtODg3NC00Y2IxLWI0YzQtYWZjNTA0OGMzODFjIiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJBRE1JTiIsInR5cGUiOiJyZWZyZXNoIiwiZXhwIjoxNzc4MTgzNjkyLCJpYXQiOjE3Nzc1Nzg4OTJ9._QErTQlt3qewRFZGjC6SMvmV9-B9keyy5lCwt-mG2cs'`
-````
-
-Response :
-
-```json
-{
-    "total_orders": 59848,
-    "breakdown_by_canal": {
-        "": 1,
-        "APP": 6069,
-        "APV": 1,
-        "APV AND": 24008,
-        "MOBILE": 1237,
-        "WEB": 28532
-    },
-    "breakdown_by_fulfillment": {
-        "": 22439,
-        "Fulfillment_Type_Liverpool": 30360,
-        "Liverpool_CNC_PICK_PACK": 7049
-    },
-    "breakdown_by_product_type": {
-        "": 22439,
-        "BT": 345,
-        "Big Ticket": 9431,
-        "SL": 1226,
-        "Soft Line": 26407
-    },
-    "percentage_with_errors": 12.018780911642828
-}
-```
-
-
-
-## 📦 Deliverables
-- Folder structure
-- Layout files
-- Reusable UI components
-- Example pages
-- Minimal but clean UI
-
----
-
-## ✨ Optional Enhancements
-- SaaS-style UI (spacing, shadows, typography)
-- Dark mode support
-- Route protection via middleware
-- State management for authentication
+El usuario puede autenticarse
+La app inicia siempre en login si no hay sesión
+Visualiza métricas clave
+Filtra datos en tiempo real
+Analiza órdenes en una sola vista integrada
+⚠️ Consideraciones Clave
+NO separar tabla y gráficos en diferentes páginas
+TODO debe vivir en /dashboard
+Filtros deben ser globales y sincronizados
+La autenticación debe controlar el acceso a toda la app

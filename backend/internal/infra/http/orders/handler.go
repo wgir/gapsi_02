@@ -31,8 +31,8 @@ func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
 	filters := domain.OrderFilters{
 		Canal:           query.Get("canal"),
 		Company:         query.Get("company"),
-		FulfillmentType: query.Get("fulfillmentType"),
-		ProductType:     query.Get("productType"),
+		FulfillmentType: query.Get("fulfillment_type"),
+		ProductType:     query.Get("product_type"),
 		Page:            page,
 		PageSize:        pageSize,
 	}
