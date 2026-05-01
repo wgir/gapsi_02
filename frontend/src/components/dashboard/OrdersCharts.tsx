@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useStats } from '@/hooks/useStats';
 import { AlertCircle } from 'lucide-react';
 import {
@@ -19,8 +20,15 @@ import {
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#6366f1'];
 
 export default function OrdersCharts() {
-  // Charts now use empty filters to always show global data
   const { data, isLoading, isError } = useStats();
+
+  /**
+   * Deferred mount flag — prevents ResponsiveContainer from measuring
+   * before the DOM has been painted, which would produce width(-1)/height(-1)
+   * warnings from Recharts.
+   */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
 
   if (isLoading) {
     return (
@@ -60,23 +68,23 @@ export default function OrdersCharts() {
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <h3 className="text-sm font-semibold text-gray-900 mb-6">Órdenes por Canal</h3>
         <div className="h-[300px] w-full">
-          {canalData.length > 0 ? (
+          {!mounted ? null : canalData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={canalData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
                   tick={{ fontSize: 12, fill: '#9ca3af' }}
                   dy={10}
                 />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
                   tick={{ fontSize: 12, fill: '#9ca3af' }}
                 />
-                <Tooltip 
+                <Tooltip
                   cursor={{ fill: '#f8fafc' }}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
@@ -95,7 +103,7 @@ export default function OrdersCharts() {
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
         <h3 className="text-sm font-semibold text-gray-900 mb-6">Distribución por Entrega</h3>
         <div className="h-[300px] w-full">
-          {fulfillmentData.length > 0 ? (
+          {!mounted ? null : fulfillmentData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -108,10 +116,10 @@ export default function OrdersCharts() {
                   dataKey="value"
                 >
                   {fulfillmentData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
                 <Legend verticalAlign="bottom" height={36} />
