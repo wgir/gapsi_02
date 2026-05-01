@@ -1,11 +1,59 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useStats } from '@/hooks/useStats';
 import { ShoppingBag, AlertTriangle, TrendingUp, Package, AlertCircle } from 'lucide-react';
 
 export default function StatsCards() {
-  // Stats cards now use empty filters to always show global stats
   const { data, isLoading, isError } = useStats();
+
+  // Memoize derived values — recalculates only when `data` reference changes
+  const stats = useMemo(() => {
+    const totalOrders = data?.total_orders ?? 0;
+    const errorPercentage = data?.percentage_with_errors ?? 0;
+    const productTypes = Object.keys(data?.breakdown_by_product_type ?? {}).length;
+
+    return [
+      {
+        title: 'Total Órdenes',
+        value: totalOrders.toLocaleString(),
+        icon: ShoppingBag,
+        color: 'blue',
+        trend: '+12.5%',
+      },
+      {
+        title: 'Órdenes con Error',
+        value: `${errorPercentage.toFixed(2)}%`,
+        icon: AlertTriangle,
+        color: 'red',
+        trend: '-2.1%',
+      },
+      {
+        title: 'Promedio Diario',
+        value: Math.round(totalOrders / 30).toLocaleString(),
+        icon: TrendingUp,
+        color: 'green',
+        trend: '+4.3%',
+      },
+      {
+        title: 'Tipos de Producto',
+        value: productTypes.toString(),
+        icon: Package,
+        color: 'purple',
+        trend: 'Estable',
+      },
+    ];
+  }, [data]);
+
+  const getColorClasses = (color: string) => {
+    const colors: Record<string, string> = {
+      blue: 'bg-blue-50 text-blue-600',
+      red: 'bg-red-50 text-red-600',
+      green: 'bg-green-50 text-green-600',
+      purple: 'bg-purple-50 text-purple-600',
+    };
+    return colors[color] ?? colors.blue;
+  };
 
   if (isLoading) {
     return (
@@ -32,51 +80,6 @@ export default function StatsCards() {
       </div>
     );
   }
-
-  const totalOrders = data?.total_orders || 0;
-  const errorPercentage = data?.percentage_with_errors || 0;
-  const productTypes = Object.keys(data?.breakdown_by_product_type || {}).length;
-
-  const stats = [
-    {
-      title: 'Total Órdenes',
-      value: totalOrders.toLocaleString(),
-      icon: ShoppingBag,
-      color: 'blue',
-      trend: '+12.5%',
-    },
-    {
-      title: 'Órdenes con Error',
-      value: `${errorPercentage.toFixed(2)}%`,
-      icon: AlertTriangle,
-      color: 'red',
-      trend: '-2.1%',
-    },
-    {
-      title: 'Promedio Diario',
-      value: Math.round(totalOrders / 30).toLocaleString(),
-      icon: TrendingUp,
-      color: 'green',
-      trend: '+4.3%',
-    },
-    {
-      title: 'Tipos de Producto',
-      value: productTypes.toString(),
-      icon: Package,
-      color: 'purple',
-      trend: 'Estable',
-    },
-  ];
-
-  const getColorClasses = (color: string) => {
-    const colors: Record<string, string> = {
-      blue: 'bg-blue-50 text-blue-600',
-      red: 'bg-red-50 text-red-600',
-      green: 'bg-green-50 text-green-600',
-      purple: 'bg-purple-50 text-purple-600',
-    };
-    return colors[color] || colors.blue;
-  };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

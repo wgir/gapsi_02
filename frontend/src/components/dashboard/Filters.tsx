@@ -10,7 +10,8 @@ export default function Filters() {
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilter(name as any, value);
+    // name comes from the HTML `name` attribute which matches FilterParams keys
+    setFilter(name as keyof typeof filters, value);
   };
 
   if (isLoading) {

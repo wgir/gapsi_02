@@ -1,4 +1,3 @@
-'use client';
 
 import Filters from '@/components/dashboard/Filters';
 import StatsCards from '@/components/dashboard/StatsCards';
