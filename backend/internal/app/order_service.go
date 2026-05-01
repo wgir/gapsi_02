@@ -28,3 +28,7 @@ func (s *OrderService) ListOrders(ctx context.Context, filters domain.OrderFilte
 func (s *OrderService) GetStats(ctx context.Context) (*domain.OrderStats, error) {
 	return s.repo.GetStats(ctx)
 }
+
+func (s *OrderService) GetFilters(ctx context.Context) (*domain.OrderFiltersOptions, error) {
+	return s.repo.GetFilters(ctx)
+}

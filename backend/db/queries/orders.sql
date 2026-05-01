@@ -12,8 +12,8 @@ SELECT * FROM orders
 WHERE 
     (canal = $1 OR $1 = '') AND
     (company = $2 OR $2 = '') AND
-    (fulfillment_type = $3 OR $3 = '') AND
-    (product_type = $4 OR $4 = '')
+    (fulfillment_type = $3 OR $3 IS NULL OR $3 = '') AND
+    (product_type = $4 OR $4 IS NULL OR $4 = '')
 ORDER BY id
 LIMIT $5 OFFSET $6;
 
@@ -22,8 +22,8 @@ SELECT COUNT(*) FROM orders
 WHERE 
     (canal = $1 OR $1 = '') AND
     (company = $2 OR $2 = '') AND
-    (fulfillment_type = $3 OR $3 = '') AND
-    (product_type = $4 OR $4 = '');
+    (fulfillment_type = $3 OR $3 IS NULL OR $3 = '') AND
+    (product_type = $4 OR $4 IS NULL OR $4 = '');
 
 -- name: GetTotalOrders :one
 SELECT COUNT(*) FROM orders;
@@ -39,3 +39,15 @@ SELECT fulfillment_type, COUNT(*) as count FROM orders GROUP BY fulfillment_type
 
 -- name: GetOrdersByProductType :many
 SELECT product_type, COUNT(*) as count FROM orders GROUP BY product_type;
+
+-- name: GetDistinctCanals :many
+SELECT DISTINCT canal FROM orders ORDER BY canal;
+
+-- name: GetDistinctCompanies :many
+SELECT DISTINCT company FROM orders ORDER BY company;
+
+-- name: GetDistinctFulfillmentTypes :many
+SELECT DISTINCT fulfillment_type FROM orders ORDER BY fulfillment_type;
+
+-- name: GetDistinctProductTypes :many
+SELECT DISTINCT product_type FROM orders ORDER BY product_type;

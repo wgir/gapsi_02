@@ -10,12 +10,35 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/user/gapsi_orders_api/internal/infra/database"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"github.com/user/gapsi_orders_api/internal/infra/database/sqlc"
 )
 
 func main() {
-	// Simple config for seeding
-	db, err := sql.Open("postgres", "host=localhost port=5432 user=root password=secret dbname=orders_db sslmode=disable")
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, relying on environment variables")
+	}
+
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_NAME")
+	dbSSL := os.Getenv("DB_SSLMODE")
+
+	if dbHost == "" { dbHost = "localhost" }
+	if dbPort == "" { dbPort = "5432" }
+	if dbUser == "" { dbUser = "root" }
+	if dbPass == "" { dbPass = "secret" }
+	if dbName == "" { dbName = "orders_db" }
+	if dbSSL == "" { dbSSL = "disable" }
+
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		dbHost, dbPort, dbUser, dbPass, dbName, dbSSL)
+
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("failed to connect to db: %v", err)
 	}
@@ -33,7 +56,7 @@ func main() {
 	}
 	fmt.Println("Schema migration completed successfully.")
 
-	queries := database.New(db)
+	queries := sqlc.New(db)
 
 	file, err := os.Open("docs/orders_db.csv")
 	if err != nil {
@@ -66,7 +89,7 @@ func main() {
 		isFlash := record[12] == "TRUE"
 		isMarketplace := record[13] == "TRUE"
 
-		err = queries.CreateOrder(ctx, database.CreateOrderParams{
+		err = queries.CreateOrder(ctx, sqlc.CreateOrderParams{
 			ID:              record[0],
 			Canal:           record[1],
 			Cantidad:        int32(cantidad),

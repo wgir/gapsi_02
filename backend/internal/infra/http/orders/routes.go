@@ -8,11 +8,7 @@ import (
 
 func RegisterOrderRoutes(r chi.Router, handler *OrderHandler, tokenHelper *jwt.TokenHelper) {
 	r.Use(common.AuthMiddleware(tokenHelper))
-	r.Get("/", handler.List)
+	r.Post("/", handler.List)
 	r.Get("/stats", handler.Stats)
-}
-
-func RegisterStatsRoutes(r chi.Router, handler *OrderHandler, tokenHelper *jwt.TokenHelper) {
-	r.Use(common.AuthMiddleware(tokenHelper))
-	r.Get("/", handler.Stats)
+	r.Get("/filters", handler.GetFilters)
 }

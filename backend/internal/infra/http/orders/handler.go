@@ -1,9 +1,7 @@
 package orders
 
 import (
-	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/user/gapsi_orders_api/internal/domain"
 	"github.com/user/gapsi_orders_api/internal/infra/http/common"
@@ -18,50 +16,49 @@ func NewOrderHandler(orderService domain.OrderService) *OrderHandler {
 }
 
 func (h *OrderHandler) List(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-
-	page, _ := strconv.Atoi(query.Get("page"))
-	if page < 1 {
-		page = 1
-	}
-	pageSize, _ := strconv.Atoi(query.Get("pageSize"))
-	if pageSize < 1 {
-		pageSize = 10
+	var filters domain.OrderFilters
+	if err := common.DecodeJSON(r, &filters); err != nil {
+		// If body is empty or invalid, we use default filters
+		filters = domain.OrderFilters{}
 	}
 
-	filters := domain.OrderFilters{
-		Canal:           query.Get("canal"),
-		Company:         query.Get("company"),
-		FulfillmentType: query.Get("fulfillmentType"),
-		ProductType:     query.Get("productType"),
-		Page:            page,
-		PageSize:        pageSize,
+	if filters.Page < 1 {
+		filters.Page = 1
+	}
+	if filters.PageSize < 1 {
+		filters.PageSize = 10
 	}
 
 	orders, total, err := h.orderService.ListOrders(r.Context(), filters)
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusInternalServerError, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
-	response := map[string]interface{}{
-		"data":  orders,
-		"total": total,
-		"page":  page,
-		"size":  pageSize,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	common.RespondWithJSON(w, http.StatusOK, map[string]interface{}{
+		"data":      orders,
+		"total":     total,
+		"page":      filters.Page,
+		"page_size": filters.PageSize,
+	})
 }
 
 func (h *OrderHandler) Stats(w http.ResponseWriter, r *http.Request) {
 	stats, err := h.orderService.GetStats(r.Context())
 	if err != nil {
-		common.RespondWithError(w, r, http.StatusInternalServerError, err.Error())
+		common.RespondWithError(w, r, err)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(stats)
+	common.RespondWithJSON(w, http.StatusOK, stats)
+}
+
+func (h *OrderHandler) GetFilters(w http.ResponseWriter, r *http.Request) {
+	options, err := h.orderService.GetFilters(r.Context())
+	if err != nil {
+		common.RespondWithError(w, r, err)
+		return
+	}
+
+	common.RespondWithJSON(w, http.StatusOK, options)
 }
