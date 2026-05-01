@@ -6,7 +6,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password } = body;
 
-    const response = await fetch('http://localhost:8090/v1/auth/login', {
+    const API_URL = process.env.API_URL || 'http://localhost:8090';
+    const response = await fetch(`${API_URL}/v1/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),

@@ -11,7 +11,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await fetch(`http://localhost:8090/v1/orders`, {
+    const API_URL = process.env.API_URL || 'http://localhost:8090';
+    const response = await fetch(`${API_URL}/v1/orders`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

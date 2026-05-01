@@ -10,7 +10,8 @@ export async function GET() {
   }
 
   try {
-    const response = await fetch(`http://localhost:8090/v1/orders/filters`, {
+    const API_URL = process.env.API_URL || 'http://localhost:8090';
+    const response = await fetch(`${API_URL}/v1/orders/filters`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
