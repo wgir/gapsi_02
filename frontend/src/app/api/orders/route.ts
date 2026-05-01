@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { config } from '@/lib/config';
 import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
@@ -11,8 +12,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const API_URL = process.env.API_URL || 'http://localhost:8090';
-    const response = await fetch(`${API_URL}/v1/orders`, {
+    const response = await fetch(`${config.apiUrl}/v1/orders`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -19,17 +19,17 @@ export const useAuth = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al iniciar sesión');
+        // Server returned 4xx/5xx — parse the error message from the body
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}: no se pudo iniciar sesión`);
       }
 
-      const result = await response.json();
-      
-      if (result.success) {
-        router.push('/dashboard');
-      }
-    } catch (err: any) {
-      setError({ message: err.message });
+      // Login succeeded — the server set the httpOnly cookies.
+      // Redirect unconditionally; do NOT rely on a `success` flag in the body.
+      router.push('/dashboard');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error desconocido al iniciar sesión';
+      setError({ message });
     } finally {
       setIsLoading(false);
     }
@@ -38,9 +38,11 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
     } catch (err) {
-      console.error('Logout error:', err);
+      // Best-effort: even if the network request fails, redirect to login
+      console.error('Logout request failed:', err);
+    } finally {
+      router.push('/login');
     }
   };
 

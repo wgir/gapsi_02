@@ -1,3 +1,4 @@
+// Core order interface — only fields used by the current UI
 export interface Order {
   id: string;
   noPedido: string;
@@ -16,11 +17,9 @@ export interface Order {
   isFlash?: boolean;
   isMarketplace?: boolean;
   plan?: string;
-  // Keep some old fields for compatibility
+  // Legacy fields kept for backward-compat with old API responses
   code?: string;
   orderStatus?: OrderStatus;
-  totalPayment?: string;
-  orderItems?: OrderItem[];
 }
 
 export interface OrderStatus {
@@ -35,105 +34,15 @@ export interface OrdersResponse {
   total: number;
   page: number;
   page_size: number;
-  total_pages?: number; // Optional as we might calculate it
-  total_rows?: number;  // Optional as we might calculate it
+  total_pages?: number;
+  total_rows?: number;
 }
 
-// ... other types stay the same
-export interface PaymentStatus {
-  code: string;
-  description: string;
-  id: number;
-  can_cancel: boolean;
-}
-
-export interface OrderAddress {
-  id: number;
-  apartment: string | null;
-  streetAddress: string;
-  addressLine2: string | null;
-  postalCode: string | null;
-  addressName: string;
-  latitude: number | null;
-  longitude: number | null;
-  phone: string;
-  floor: number | null;
-  district: string | null;
-  city: string;
-  state: string;
-  country: string;
-  neighborhood: string | null;
-  reference: string | null;
-}
-
-export interface CustomerDetails {
-  id: number;
-  userId: number;
-  documentType: DocumentType;
-  documentNumber: string;
-  name: string;
-  email: string;
-}
-
-export interface DocumentType {
-  id: number;
-  code: string;
-  description: string;
-}
-
-export interface PaymentMethod {
-  id: number;
-  code: string;
-  description: string;
-  paymentMethodType: PaymentMethodType;
-  isOnline: boolean;
-  canCancel: boolean;
-}
-
-export interface PaymentMethodType {
-  id: number;
-  code: string;
-  description: string;
-}
-
-export interface DeliveryMethod {
-  id: number;
-  code: string;
-  description: string;
-  canCancel: boolean;
-}
-
-export interface OrderStatusHistory {
-  id: number;
-  status: OrderStatus;
-  isCurrent: boolean;
-  dateCreated: string;
-  userEmail: string;
-}
-
-export interface OrderItem {
-  id: number;
-  orderCode: string;
-  orderId: number;
-  sku: string;
-  name: string;
-  quantity: number;
-  unitPrice: string;
-  unitPriceWithTaxes: string;
-  lineTotal: string;
-  lineTotalWithTaxes: string;
-  isCombo: boolean;
-  comboItems?: ComboItem[];
-}
-
-export interface ComboItem {
-  id: number;
-  name: string;
-  sku: string;
-  quantity: number;
-  isComboItem: boolean;
-  unitPrice: string;
-  unitPriceWithTaxes: string;
-  lineTotal: string;
-  lineTotalWithTaxes: string;
+// Normalised shape returned by useOrders (after adapter transform)
+export interface NormalisedOrdersPage {
+  data: Order[];
+  total_rows: number;
+  total_pages: number;
+  current_page: number;
+  page_size: number;
 }
