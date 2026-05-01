@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { config } from '@/lib/config';
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -10,8 +11,7 @@ export async function GET() {
   }
 
   try {
-    const API_URL = process.env.API_URL || 'http://localhost:8090';
-    const response = await fetch(`${API_URL}/v1/orders/filters`, {
+    const response = await fetch(`${config.apiUrl}/v1/orders/filters`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

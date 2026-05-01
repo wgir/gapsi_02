@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { config } from '@/lib/config';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,8 +12,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const API_URL = process.env.API_URL || 'http://localhost:8090';
-    const response = await fetch(`${API_URL}/v1/orders/stats?${searchParams.toString()}`, {
+    const response = await fetch(`${config.apiUrl}/v1/orders/stats?${searchParams.toString()}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

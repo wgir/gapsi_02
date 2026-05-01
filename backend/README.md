@@ -110,19 +110,7 @@ docker build -t gapsi-orders-api .
 Puedes correr el contenedor vinculándolo directamente a tu contenedor de base de datos (por ejemplo, si se llama `postgres-container`):
 
 ```bash
-docker run -p 8090:8090 \
-  --link postgres-container:db \
-  -e SERVER_PORT=8090 \
-  -e DB_HOST=db \
-  -e DB_PORT=5432 \
-  -e DB_USER=root \
-  -e DB_PASSWORD=secret \
-  -e DB_NAME=orders_db \
-  -e DB_SSLMODE=disable \
-  -e JWT_SECRET=super_secret_key_change_me_in_production \
-  -e JWT_ACCESS_TTL_MINUTES=75 \
-  -e JWT_REFRESH_TTL_DAYS=7 \
-  gapsi-orders-api
+ docker run -p 8090:8090 --link postgres-container:db -e SERVER_PORT=8090 -e DB_HOST=db -e DB_PORT=5432 -e DB_USER=root -e DB_PASSWORD=secret -e DB_NAME=orders_db -e DB_SSLMODE=disable -e JWT_SECRET=super_secret_key_change_me_in_production -e JWT_ACCESS_TTL_MINUTES=75 -e JWT_REFRESH_TTL_DAYS=7 gapsi-orders-api
 ```
 
 *(La API estará disponible en `http://localhost:8090`)*
